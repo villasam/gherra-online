@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gherra Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <section id="home">
+        <h1>Gherra Online</h1>
+
+        <h2>Entra in partita</h2>
+
+        <input id="playerNameInput" type="text" placeholder="Il tuo nome">
+
+        <br><br>
+
+        <button id="createRoomButton">Crea stanza</button>
+
+        <hr>
+
+        <input id="roomCodeInput" type="text" placeholder="Codice stanza">
+        <button id="joinRoomButton">Entra nella stanza</button>
+    </section>
+
+    <section id="lobby" style="display: none;">
+        <h2>Lobby</h2>
+
+        <p>
+            Codice stanza:
+            <strong id="roomCodeDisplay"></strong>
+        </p>
+
+        <h3>Giocatori</h3>
+        <ul id="playersList"></ul>
+
+        <button id="startGameButton" style="display: none;">
+            Inizia partita
+        </button>
+    </section>
+
+    <section id="game" style="display: none;">
+        <h2>Partita</h2>
+
+        <p>
+            Stanza:
+            <strong id="gameRoomCodeDisplay"></strong>
+        </p>
+
+        <p>
+            Turno di:
+            <strong id="currentTurnDisplay"></strong>
+        </p>
+
+        <p id="winnerMessage" style="font-weight: bold;"></p>
+        <button id="restartGameButton" style="display: none;">
+            Ricomincia partita
+        </button>
+
+        <hr>
+
+        <h3>Tu</h3>
+
+        <p>
+            Nome:
+            <strong id="myNameDisplay"></strong>
+        </p>
+
+        <p>
+            Vite:
+            <strong id="myLivesDisplay"></strong>
+        </p>
+
+        <p>
+            Difesa:
+            <strong id="myDefenseDisplay"></strong>
+        </p>
+
+        <p>
+            Numero carichi:
+            <strong id="myChargesDisplay"></strong>
+        </p>
+
+        <hr>
+
+        <h3>Azioni</h3>
+
+        <button id="chargeButton">Carica</button>
+
+        <br><br>
+
+        <label for="defenseTargetSelect">Bersaglio difesa:</label>
+        <select id="defenseTargetSelect"></select>
+
+        <button id="changeDefenseButton">
+            Cambia difesa
+        </button>
+
+        <br><br>
+
+        <label for="attackTargetSelect">Bersaglio attacco:</label>
+        <select id="attackTargetSelect"></select>
+
+        <br><br>
+
+        <label for="chargesToUseInput">Carichi da usare:</label>
+        <input id="chargesToUseInput" type="number" min="0" value="0">
+
+        <button id="attackButton">
+            Attacca
+        </button>
+
+        <hr>
+
+        <h3>Ultima azione</h3>
+        <p id="lastActionDisplay">Nessuna azione ancora.</p>
+
+        <hr>
+
+        <h3>Giocatori</h3>
+        <ul id="gamePlayersList"></ul>
+    </section>
+
+    <p id="message"></p>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+
+</body>
+
+</html>
