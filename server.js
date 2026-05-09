@@ -35,21 +35,18 @@ function generateRoomCode() {
     return code;
 }
 
-function getPublicPlayers(room) {
+function findPlayer(room, playerId) {
+    return room.players.find((player) => player.id === playerId);
+}
+
+function getLobbyPlayers(room) {
     return room.players.map((player) => {
         return {
             id: player.id,
-            name: player.name
+            name: player.name,
+            ready: player.ready
         };
     });
-}
-
-function getCurrentTurnPlayer(room) {
-    return room.players[room.currentTurnIndex];
-}
-
-function findPlayer(room, playerId) {
-    return room.players.find((player) => player.id === playerId);
 }
 
 function countAlivePlayers(room) {
@@ -64,6 +61,10 @@ function getWinner(room) {
     }
 
     return null;
+}
+
+function getCurrentTurnPlayer(room) {
+    return room.players[room.currentTurnIndex];
 }
 
 function nextTurn(room) {
@@ -94,6 +95,44 @@ function checkVictory(room) {
         room.winnerName = winner.name;
         room.lastAction = `Partita finita. Ha vinto ${winner.name}!`;
     }
+}
+
+function resetPlayersForGame(room) {
+    room.players = room.players.map((player) => {
+        return {
+            id: player.id,
+            name: player.name,
+            ready: false,
+            lives: drawLives(),
+            defense: drawCard(),
+            charges: [],
+            alive: true
+        };
+    });
+}
+
+function startGame(room) {
+    room.status = 'playing';
+    room.currentTurnIndex = 0;
+    room.winnerId = null;
+    room.winnerName = null;
+    room.lastAction = 'La partita è iniziata.';
+
+    resetPlayersForGame(room);
+
+    sendGameStarted(room);
+}
+
+function canAutoStart(room) {
+    if (room.status !== 'lobby') {
+        return false;
+    }
+
+    if (room.players.length < 2) {
+        return false;
+    }
+
+    return room.players.every((player) => player.ready);
 }
 
 function getStateForPlayer(room, socketId) {
@@ -132,6 +171,20 @@ function getStateForPlayer(room, socketId) {
             };
         })
     };
+}
+
+function sendLobbyState(room) {
+    io.to(room.code).emit('lobbyUpdated', {
+        roomCode: room.code,
+        players: getLobbyPlayers(room)
+    });
+}
+
+function sendGameStarted(room) {
+    room.players.forEach((player) => {
+        const state = getStateForPlayer(room, player.id);
+        io.to(player.id).emit('gameStarted', state);
+    });
 }
 
 function sendGameState(room) {
@@ -173,25 +226,6 @@ function isPlayerTurn(socket, room) {
     return true;
 }
 
-function resetRoomForNewGame(room) {
-    room.status = 'playing';
-    room.currentTurnIndex = 0;
-    room.winnerId = null;
-    room.winnerName = null;
-    room.lastAction = 'Nuova partita iniziata.';
-
-    room.players = room.players.map((player) => {
-        return {
-            id: player.id,
-            name: player.name,
-            lives: drawLives(),
-            defense: drawCard(),
-            charges: [],
-            alive: true
-        };
-    });
-}
-
 io.on('connection', (socket) => {
     console.log('Utente collegato:', socket.id);
 
@@ -204,7 +238,6 @@ io.on('connection', (socket) => {
 
         const room = {
             code: roomCode,
-            hostId: socket.id,
             status: 'lobby',
             currentTurnIndex: 0,
             winnerId: null,
@@ -213,7 +246,8 @@ io.on('connection', (socket) => {
             players: [
                 {
                     id: socket.id,
-                    name: playerName
+                    name: playerName,
+                    ready: false
                 }
             ]
         };
@@ -223,8 +257,7 @@ io.on('connection', (socket) => {
 
         socket.emit('roomJoined', {
             roomCode: roomCode,
-            players: getPublicPlayers(room),
-            isHost: true
+            players: getLobbyPlayers(room)
         });
 
         console.log(`Stanza creata: ${roomCode}`);
@@ -248,26 +281,23 @@ io.on('connection', (socket) => {
 
         room.players.push({
             id: socket.id,
-            name: playerName
+            name: playerName,
+            ready: false
         });
 
         socket.join(roomCode);
 
-        io.to(roomCode).emit(
-            'playersUpdated',
-            getPublicPlayers(room)
-        );
-
         socket.emit('roomJoined', {
             roomCode: roomCode,
-            players: getPublicPlayers(room),
-            isHost: socket.id === room.hostId
+            players: getLobbyPlayers(room)
         });
+
+        sendLobbyState(room);
 
         console.log(`${playerName} è entrato nella stanza ${roomCode}`);
     });
 
-    socket.on('startGame', (roomCode) => {
+    socket.on('toggleReady', (roomCode) => {
         if (!rooms.has(roomCode)) {
             socket.emit('errorMessage', 'Stanza non trovata.');
             return;
@@ -275,28 +305,29 @@ io.on('connection', (socket) => {
 
         const room = rooms.get(roomCode);
 
-        if (socket.id !== room.hostId) {
-            socket.emit('errorMessage', 'Solo il creatore può iniziare.');
+        if (room.status !== 'lobby') {
+            socket.emit('errorMessage', 'La partita è già iniziata.');
             return;
         }
 
-        if (room.players.length < 2) {
-            socket.emit('errorMessage', 'Servono almeno 2 giocatori.');
+        const player = findPlayer(room, socket.id);
+
+        if (!player) {
+            socket.emit('errorMessage', 'Giocatore non trovato.');
             return;
         }
 
-        resetRoomForNewGame(room);
-        room.lastAction = 'La partita è iniziata.';
+        player.ready = !player.ready;
 
-        room.players.forEach((player) => {
-            const state = getStateForPlayer(room, player.id);
-            io.to(player.id).emit('gameStarted', state);
-        });
-
-        console.log(`Partita iniziata nella stanza ${roomCode}`);
+        if (canAutoStart(room)) {
+            startGame(room);
+        }
+        else {
+            sendLobbyState(room);
+        }
     });
 
-    socket.on('restartGame', (roomCode) => {
+    socket.on('restartToLobby', (roomCode) => {
         if (!rooms.has(roomCode)) {
             socket.emit('errorMessage', 'Stanza non trovata.');
             return;
@@ -309,11 +340,26 @@ io.on('connection', (socket) => {
             return;
         }
 
-        resetRoomForNewGame(room);
+        room.status = 'lobby';
+        room.currentTurnIndex = 0;
+        room.winnerId = null;
+        room.winnerName = null;
+        room.lastAction = null;
 
-        sendGameState(room);
+        room.players = room.players.map((player) => {
+            return {
+                id: player.id,
+                name: player.name,
+                ready: false
+            };
+        });
 
-        console.log(`Nuova partita iniziata nella stanza ${roomCode}`);
+        io.to(room.code).emit('roomJoined', {
+            roomCode: room.code,
+            players: getLobbyPlayers(room)
+        });
+
+        sendLobbyState(room);
     });
 
     socket.on('charge', (roomCode) => {
@@ -329,9 +375,7 @@ io.on('connection', (socket) => {
 
         const currentPlayer = getCurrentTurnPlayer(room);
 
-        const card = drawCard();
-
-        currentPlayer.charges.push(card);
+        currentPlayer.charges.push(drawCard());
 
         room.lastAction =
             `${currentPlayer.name} ha caricato una carta coperta.`;
@@ -431,7 +475,6 @@ io.on('connection', (socket) => {
         }
 
         const attackCard = drawCard();
-
         const usedCharges = attacker.charges.splice(0, chargesToUse);
 
         const chargeSum = usedCharges.reduce((sum, card) => {

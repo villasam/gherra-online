@@ -9,7 +9,7 @@ const roomCodeInput = document.getElementById('roomCodeInput');
 
 const createRoomButton = document.getElementById('createRoomButton');
 const joinRoomButton = document.getElementById('joinRoomButton');
-const startGameButton = document.getElementById('startGameButton');
+const readyButton = document.getElementById('readyButton');
 
 const chargeButton = document.getElementById('chargeButton');
 const changeDefenseButton = document.getElementById('changeDefenseButton');
@@ -22,6 +22,8 @@ const chargesToUseInput = document.getElementById('chargesToUseInput');
 
 const roomCodeDisplay = document.getElementById('roomCodeDisplay');
 const playersList = document.getElementById('playersList');
+const myReadyDisplay = document.getElementById('myReadyDisplay');
+const readyInfoDisplay = document.getElementById('readyInfoDisplay');
 
 const message = document.getElementById('message');
 
@@ -41,6 +43,7 @@ let currentRoomCode = null;
 let myId = null;
 let currentTurnPlayerId = null;
 let myChargeCount = 0;
+let myReady = false;
 
 socket.on('connect', () => {
     myId = socket.id;
@@ -77,8 +80,8 @@ joinRoomButton.addEventListener('click', () => {
     });
 });
 
-startGameButton.addEventListener('click', () => {
-    socket.emit('startGame', currentRoomCode);
+readyButton.addEventListener('click', () => {
+    socket.emit('toggleReady', currentRoomCode);
 });
 
 chargeButton.addEventListener('click', () => {
@@ -106,7 +109,7 @@ attackButton.addEventListener('click', () => {
 });
 
 restartGameButton.addEventListener('click', () => {
-    socket.emit('restartGame', currentRoomCode);
+    socket.emit('restartToLobby', currentRoomCode);
 });
 
 socket.on('roomJoined', (data) => {
@@ -118,16 +121,13 @@ socket.on('roomJoined', (data) => {
 
     roomCodeDisplay.textContent = data.roomCode;
 
-    startGameButton.style.display =
-        data.isHost ? 'inline-block' : 'none';
-
-    updatePlayersList(data.players);
+    renderLobby(data.players);
 
     message.textContent = '';
 });
 
-socket.on('playersUpdated', (players) => {
-    updatePlayersList(players);
+socket.on('lobbyUpdated', (data) => {
+    renderLobby(data.players);
 });
 
 socket.on('gameStarted', (state) => {
@@ -146,14 +146,37 @@ socket.on('errorMessage', (text) => {
     message.textContent = text;
 });
 
-function updatePlayersList(players) {
+function renderLobby(players) {
     playersList.innerHTML = '';
+
+    const readyCount = players.filter((player) => player.ready).length;
 
     players.forEach((player) => {
         const li = document.createElement('li');
-        li.textContent = player.name;
+
+        const readyText = player.ready ? 'Pronto' : 'Non pronto';
+
+        if (player.id === myId) {
+            li.textContent = `${player.name} (tu) - ${readyText}`;
+            myReady = player.ready;
+        }
+        else {
+            li.textContent = `${player.name} - ${readyText}`;
+        }
+
         playersList.appendChild(li);
     });
+
+    myReadyDisplay.textContent = myReady ? 'Pronto' : 'Non pronto';
+    readyButton.textContent = myReady ? 'Annulla pronto' : 'Pronto';
+
+    if (players.length < 2) {
+        readyInfoDisplay.textContent = 'Servono almeno 2 giocatori per iniziare.';
+    }
+    else {
+        readyInfoDisplay.textContent =
+            `${readyCount}/${players.length} giocatori pronti. La partita parte quando tutti sono pronti.`;
+    }
 }
 
 function renderGameState(state) {
