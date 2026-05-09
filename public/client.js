@@ -18,7 +18,8 @@ const restartGameButton = document.getElementById('restartGameButton');
 
 const defenseTargetSelect = document.getElementById('defenseTargetSelect');
 const attackTargetSelect = document.getElementById('attackTargetSelect');
-const chargesToUseInput = document.getElementById('chargesToUseInput');
+const chargesButtonsContainer = document.getElementById('chargesButtonsContainer');
+const selectedChargesDisplay = document.getElementById('selectedChargesDisplay');
 
 const roomCodeDisplay = document.getElementById('roomCodeDisplay');
 const playersList = document.getElementById('playersList');
@@ -43,6 +44,7 @@ let currentRoomCode = null;
 let myId = null;
 let currentTurnPlayerId = null;
 let myChargeCount = 0;
+let selectedChargesToUse = 0;
 let myReady = false;
 
 socket.on('connect', () => {
@@ -99,7 +101,7 @@ changeDefenseButton.addEventListener('click', () => {
 
 attackButton.addEventListener('click', () => {
     const targetId = attackTargetSelect.value;
-    const chargesToUse = Number(chargesToUseInput.value);
+    const chargesToUse = selectedChargesToUse;
 
     socket.emit('attack', {
         roomCode: currentRoomCode,
@@ -217,13 +219,16 @@ function renderGameState(state) {
 
     attackButton.disabled = !isMyTurn || gameIsFinished || !amIAlive;
     attackTargetSelect.disabled = !isMyTurn || gameIsFinished || !amIAlive;
-    chargesToUseInput.disabled = !isMyTurn || gameIsFinished || !amIAlive;
-
-    chargesToUseInput.max = myChargeCount;
-
-    if (Number(chargesToUseInput.value) > myChargeCount) {
-        chargesToUseInput.value = myChargeCount;
+    if (selectedChargesToUse > myChargeCount) {
+        selectedChargesToUse = myChargeCount;
     }
+
+    selectedChargesDisplay.textContent = selectedChargesToUse;
+
+    renderChargeButtons(
+        myChargeCount,
+        !isMyTurn || gameIsFinished || !amIAlive
+    );
 
     renderDefenseTargets(state.players);
     renderAttackTargets(state.players);
@@ -289,4 +294,29 @@ function renderPlayersList(players) {
 
         gamePlayersList.appendChild(li);
     });
+}
+
+function renderChargeButtons(chargeCount, disabled) {
+    chargesButtonsContainer.innerHTML = '';
+
+    for (let i = 0; i <= chargeCount; i++) {
+        const button = document.createElement('button');
+
+        button.textContent = i;
+        button.disabled = disabled;
+
+        if (i === selectedChargesToUse) {
+            button.style.fontWeight = 'bold';
+            button.style.border = '3px solid black';
+        }
+
+        button.addEventListener('click', () => {
+            selectedChargesToUse = i;
+            selectedChargesDisplay.textContent = selectedChargesToUse;
+
+            renderChargeButtons(chargeCount, disabled);
+        });
+
+        chargesButtonsContainer.appendChild(button);
+    }
 }
