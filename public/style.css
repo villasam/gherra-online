@@ -1,40 +1,227 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-
-    margin: 0;
-    padding: 20px;
-
-    font-size: 22px;
+* {
+    box-sizing: border-box;
 }
 
-button {
-    font-size: 22px;
+body {
+    margin: 0;
+    padding: 16px;
 
-    padding: 14px 20px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+
+    background: #141414;
+    color: #f4f4f4;
+}
+
+.screen {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+h1 {
+    margin: 8px 0 18px 0;
+
+    text-align: center;
+    font-size: 34px;
+}
+
+h2 {
+    margin: 0 0 14px 0;
+
+    font-size: 25px;
+}
+
+p {
+    margin: 10px 0;
+}
+
+.panel {
+    margin-bottom: 16px;
+    padding: 16px;
+
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 18px;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.main-panel {
+    border: 2px solid #555;
+}
+
+.turn-box {
+    margin-bottom: 16px;
+    padding: 14px 16px;
+
+    text-align: center;
+    font-size: 24px;
+
+    background: #2c2c2c;
+    border-radius: 18px;
+    border: 1px solid #444;
+}
+
+input,
+select,
+button {
+    width: 100%;
 
     margin-top: 10px;
+    padding: 14px;
+
+    font-size: 20px;
+
+    border-radius: 14px;
+    border: none;
 }
 
 input,
 select {
-    font-size: 22px;
-
-    padding: 10px;
-
-    margin-top: 10px;
+    background: #f3f3f3;
+    color: #111;
 }
 
-h1 {
-    font-size: 42px;
+button {
+    background: #f4f4f4;
+    color: #111;
+
+    font-weight: bold;
 }
 
-h2 {
-    font-size: 32px;
+button:disabled {
+    opacity: 0.35;
 }
 
-p,
-li,
-label {
+.separator {
+    height: 1px;
+    margin: 20px 0;
+
+    background: #444;
+}
+
+.room-code {
+    padding: 14px;
+
+    text-align: center;
+    font-size: 34px;
+    letter-spacing: 4px;
+    font-weight: bold;
+
+    background: #111;
+    border-radius: 14px;
+}
+
+.players-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.player-card {
+    padding: 14px;
+
+    background: #303030;
+    border: 2px solid #444;
+    border-radius: 16px;
+}
+
+.me-card {
+    border-color: #d6d6d6;
+}
+
+.turn-card {
+    background: #3a3524;
+    border-color: #e6c15a;
+}
+
+.dead-card {
+    opacity: 0.45;
+}
+
+.player-name {
+    margin-bottom: 10px;
+
     font-size: 24px;
+    font-weight: bold;
+}
+
+.player-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.player-status {
+    margin-top: 10px;
+
+    font-weight: bold;
+}
+
+.last-action {
+    line-height: 1.35;
+}
+
+.action-block {
+    margin-top: 18px;
+    padding-top: 14px;
+
+    border-top: 1px solid #444;
+}
+
+.charge-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.charge-buttons button {
+    width: auto;
+    min-width: 54px;
+
+    padding: 12px 16px;
+}
+
+.selected-charge-button {
+    border: 3px solid #e6c15a;
+    background: #3a3524;
+    color: #f4f4f4;
+}
+
+.winner-message {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.message {
+    width: 100%;
+    max-width: 520px;
+
+    margin: 12px auto 0 auto;
+
+    color: #ffb3b3;
+    font-weight: bold;
+}
+
+ul {
+    padding-left: 22px;
+}
+
+.main-create-button {
+    margin-top: 22px;
+
+    padding: 20px;
+
+    font-size: 24px;
+}
+
+.big-separator {
+    margin: 28px 0 22px 0;
+
+    text-align: center;
+    font-size: 18px;
+
+    color: #aaaaaa;
 }

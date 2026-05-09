@@ -3,123 +3,107 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Gherra Online</title>
+    <title>Gherra</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <section id="home">
-        <h1>Gherra Online</h1>
+    <section id="home" class="screen">
+        <h1>Gherra</h1>
 
-        <h2>Entra in partita</h2>
+        <div class="panel">
 
-        <input id="playerNameInput" type="text" placeholder="Il tuo nome">
+            <input id="playerNameInput" type="text" placeholder="Il tuo nome">
 
-        <br><br>
+            <button id="createRoomButton" class="main-create-button">
+                Crea stanza
+            </button>
 
-        <button id="createRoomButton">Crea stanza</button>
+            <div class="big-separator">
+                oppure
+            </div>
 
-        <hr>
+            <input id="roomCodeInput" type="text" placeholder="Codice stanza">
 
-        <input id="roomCodeInput" type="text" placeholder="Codice stanza">
-        <button id="joinRoomButton">Entra nella stanza</button>
+            <button id="joinRoomButton">
+                Entra nella stanza
+            </button>
+        </div>
     </section>
 
-    <section id="lobby" style="display: none;">
-        <h2>Lobby</h2>
+    <section id="lobby" class="screen" style="display: none;">
+        <h1>Lobby</h1>
 
-        <p>
-            Codice stanza:
-            <strong id="roomCodeDisplay"></strong>
-        </p>
+        <div class="panel">
+            <p>Codice stanza:</p>
+            <div class="room-code" id="roomCodeDisplay"></div>
 
-        <p>
-            Stato:
-            <strong id="myReadyDisplay">Non pronto</strong>
-        </p>
+            <p>Stato: <strong id="myReadyDisplay">Non pronto</strong></p>
 
-        <button id="readyButton">
-            Pronto
-        </button>
+            <button id="readyButton">Pronto</button>
+        </div>
 
-        <h3>Giocatori</h3>
-        <ul id="playersList"></ul>
-
-        <p id="readyInfoDisplay"></p>
+        <div class="panel">
+            <h2>Giocatori</h2>
+            <ul id="playersList"></ul>
+            <p id="readyInfoDisplay"></p>
+        </div>
     </section>
 
-    <section id="game" style="display: none;">
-        <h2>Partita</h2>
+    <section id="game" class="screen" style="display: none;">
 
-        <p>
-            Stanza:
-            <strong id="gameRoomCodeDisplay"></strong>
-        </p>
+        <div class="turn-box">
+            Turno di: <strong id="currentTurnDisplay"></strong>
+        </div>
 
-        <p>
-            Turno di:
-            <strong id="currentTurnDisplay"></strong>
-        </p>
-
-        <p id="winnerMessage" style="font-weight: bold;"></p>
+        <p id="winnerMessage" class="winner-message"></p>
 
         <button id="restartGameButton" style="display: none;">
             Ricomincia partita
         </button>
 
-        <hr>
+        <section class="panel main-panel">
+            <h2>Giocatori</h2>
+            <div id="gamePlayersList" class="players-grid"></div>
+        </section>
 
-        <h3>Tu</h3>
+        <section class="panel">
+            <h2>Ultima azione</h2>
+            <p id="lastActionDisplay" class="last-action">
+                Nessuna azione ancora.
+            </p>
+        </section>
 
-        <p>Nome: <strong id="myNameDisplay"></strong></p>
-        <p>Vite: <strong id="myLivesDisplay"></strong></p>
-        <p>Difesa: <strong id="myDefenseDisplay"></strong></p>
-        <p>Numero carichi: <strong id="myChargesDisplay"></strong></p>
+        <section class="panel">
+            <h2>Azioni</h2>
 
-        <hr>
+            <button id="chargeButton">Carica</button>
 
-        <h3>Azioni</h3>
+            <div class="action-block">
+                <label for="defenseTargetSelect">Bersaglio difesa</label>
+                <select id="defenseTargetSelect"></select>
+                <button id="changeDefenseButton">Cambia difesa</button>
+            </div>
 
-        <button id="chargeButton">Carica</button>
+            <div class="action-block">
+                <label for="attackTargetSelect">Bersaglio attacco</label>
+                <select id="attackTargetSelect"></select>
 
-        <br><br>
+                <p>Carichi da usare:</p>
+                <div id="chargesButtonsContainer" class="charge-buttons"></div>
 
-        <label for="defenseTargetSelect">Bersaglio difesa:</label>
-        <select id="defenseTargetSelect"></select>
+                <p>
+                    Carichi selezionati:
+                    <strong id="selectedChargesDisplay">0</strong>
+                </p>
 
-        <button id="changeDefenseButton">Cambia difesa</button>
-
-        <br><br>
-
-        <label for="attackTargetSelect">Bersaglio attacco:</label>
-        <select id="attackTargetSelect"></select>
-
-        <br><br>
-
-        <p>Carichi da usare:</p>
-
-        <div id="chargesButtonsContainer"></div>
-
-        <p>
-            Carichi selezionati:
-            <strong id="selectedChargesDisplay">0</strong>
-        </p>
-
-<button id="attackButton">Attacca</button>
-
-        <hr>
-
-        <h3>Ultima azione</h3>
-        <p id="lastActionDisplay">Nessuna azione ancora.</p>
-
-        <hr>
-
-        <h3>Giocatori</h3>
-        <ul id="gamePlayersList"></ul>
+                <button id="attackButton">Attacca</button>
+            </div>
+        </section>
     </section>
 
-    <p id="message"></p>
+    <p id="message" class="message"></p>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>

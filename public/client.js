@@ -18,6 +18,7 @@ const restartGameButton = document.getElementById('restartGameButton');
 
 const defenseTargetSelect = document.getElementById('defenseTargetSelect');
 const attackTargetSelect = document.getElementById('attackTargetSelect');
+
 const chargesButtonsContainer = document.getElementById('chargesButtonsContainer');
 const selectedChargesDisplay = document.getElementById('selectedChargesDisplay');
 
@@ -28,14 +29,8 @@ const readyInfoDisplay = document.getElementById('readyInfoDisplay');
 
 const message = document.getElementById('message');
 
-const gameRoomCodeDisplay = document.getElementById('gameRoomCodeDisplay');
 const currentTurnDisplay = document.getElementById('currentTurnDisplay');
 const winnerMessage = document.getElementById('winnerMessage');
-
-const myNameDisplay = document.getElementById('myNameDisplay');
-const myLivesDisplay = document.getElementById('myLivesDisplay');
-const myDefenseDisplay = document.getElementById('myDefenseDisplay');
-const myChargesDisplay = document.getElementById('myChargesDisplay');
 
 const lastActionDisplay = document.getElementById('lastActionDisplay');
 const gamePlayersList = document.getElementById('gamePlayersList');
@@ -101,12 +96,11 @@ changeDefenseButton.addEventListener('click', () => {
 
 attackButton.addEventListener('click', () => {
     const targetId = attackTargetSelect.value;
-    const chargesToUse = selectedChargesToUse;
 
     socket.emit('attack', {
         roomCode: currentRoomCode,
         targetId: targetId,
-        chargesToUse: chargesToUse
+        chargesToUse: selectedChargesToUse
     });
 });
 
@@ -136,6 +130,8 @@ socket.on('gameStarted', (state) => {
     homeSection.style.display = 'none';
     lobbySection.style.display = 'none';
     gameSection.style.display = 'block';
+
+    selectedChargesToUse = 0;
 
     renderGameState(state);
 });
@@ -185,13 +181,7 @@ function renderGameState(state) {
     currentTurnPlayerId = state.currentTurnPlayerId;
     myChargeCount = state.me.chargeCount;
 
-    gameRoomCodeDisplay.textContent = state.roomCode;
     currentTurnDisplay.textContent = state.currentTurnPlayerName;
-
-    myNameDisplay.textContent = state.me.name;
-    myLivesDisplay.textContent = state.me.lives;
-    myDefenseDisplay.textContent = state.me.defense;
-    myChargesDisplay.textContent = state.me.chargeCount;
 
     lastActionDisplay.textContent = state.lastAction || 'Nessuna azione ancora.';
 
@@ -203,7 +193,7 @@ function renderGameState(state) {
     }
 
     if (state.status === 'finished') {
-        restartGameButton.style.display = 'inline-block';
+        restartGameButton.style.display = 'block';
     }
     else {
         restartGameButton.style.display = 'none';
@@ -219,19 +209,19 @@ function renderGameState(state) {
 
     attackButton.disabled = !isMyTurn || gameIsFinished || !amIAlive;
     attackTargetSelect.disabled = !isMyTurn || gameIsFinished || !amIAlive;
+
     if (selectedChargesToUse > myChargeCount) {
         selectedChargesToUse = myChargeCount;
     }
 
     selectedChargesDisplay.textContent = selectedChargesToUse;
 
+    renderDefenseTargets(state.players);
+    renderAttackTargets(state.players);
     renderChargeButtons(
         myChargeCount,
         !isMyTurn || gameIsFinished || !amIAlive
     );
-
-    renderDefenseTargets(state.players);
-    renderAttackTargets(state.players);
     renderPlayersList(state.players);
 
     message.textContent = '';
@@ -279,23 +269,6 @@ function renderAttackTargets(players) {
     });
 }
 
-function renderPlayersList(players) {
-    gamePlayersList.innerHTML = '';
-
-    players.forEach((player) => {
-        const li = document.createElement('li');
-
-        li.textContent =
-            `${player.name} | vite: ${player.lives} | difesa: ${player.defense} | carichi: ${player.chargeCount}`;
-
-        if (!player.alive) {
-            li.textContent += ' | eliminato';
-        }
-
-        gamePlayersList.appendChild(li);
-    });
-}
-
 function renderChargeButtons(chargeCount, disabled) {
     chargesButtonsContainer.innerHTML = '';
 
@@ -306,8 +279,7 @@ function renderChargeButtons(chargeCount, disabled) {
         button.disabled = disabled;
 
         if (i === selectedChargesToUse) {
-            button.style.fontWeight = 'bold';
-            button.style.border = '3px solid black';
+            button.classList.add('selected-charge-button');
         }
 
         button.addEventListener('click', () => {
@@ -319,4 +291,64 @@ function renderChargeButtons(chargeCount, disabled) {
 
         chargesButtonsContainer.appendChild(button);
     }
+}
+
+function renderPlayersList(players) {
+    gamePlayersList.innerHTML = '';
+
+    players.forEach((player) => {
+        const card = document.createElement('div');
+
+        card.classList.add('player-card');
+
+        if (player.id === myId) {
+            card.classList.add('me-card');
+        }
+
+        if (player.id === currentTurnPlayerId) {
+            card.classList.add('turn-card');
+        }
+
+        if (!player.alive) {
+            card.classList.add('dead-card');
+        }
+
+        const name = document.createElement('div');
+        name.classList.add('player-name');
+
+        if (player.id === myId) {
+            name.textContent = `${player.name} (tu)`;
+        }
+        else {
+            name.textContent = player.name;
+        }
+
+        const stats = document.createElement('div');
+        stats.classList.add('player-stats');
+
+        stats.innerHTML = `
+            <span>Vite: <strong>${player.lives}</strong></span>
+            <span>Difesa: <strong>${player.defense}</strong></span>
+            <span>Carichi: <strong>${player.chargeCount}</strong></span>
+        `;
+
+        const status = document.createElement('div');
+        status.classList.add('player-status');
+
+        if (!player.alive) {
+            status.textContent = 'Eliminato';
+        }
+        else if (player.id === currentTurnPlayerId) {
+            status.textContent = 'Di turno';
+        }
+        else {
+            status.textContent = '';
+        }
+
+        card.appendChild(name);
+        card.appendChild(stats);
+        card.appendChild(status);
+
+        gamePlayersList.appendChild(card);
+    });
 }
