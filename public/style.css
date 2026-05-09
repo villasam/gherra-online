@@ -4,10 +4,10 @@
 
 body {
     margin: 0;
-    padding: 16px;
+    padding: 10px;
 
     font-family: Arial, sans-serif;
-    font-size: 20px;
+    font-size: 22px;
 
     background: #141414;
     color: #f4f4f4;
@@ -15,21 +15,21 @@ body {
 
 .screen {
     width: 100%;
-    max-width: 520px;
+    max-width: 640px;
     margin: 0 auto;
 }
 
 h1 {
-    margin: 8px 0 18px 0;
+    margin: 4px 0 12px 0;
 
     text-align: center;
     font-size: 34px;
 }
 
 h2 {
-    margin: 0 0 14px 0;
+    margin: 0 0 10px 0;
 
-    font-size: 25px;
+    font-size: 26px;
 }
 
 p {
@@ -37,14 +37,14 @@ p {
 }
 
 .panel {
-    margin-bottom: 16px;
-    padding: 16px;
+    margin-bottom: 12px;
+    padding: 12px;
 
     background: #222;
     border: 1px solid #333;
-    border-radius: 18px;
+    border-radius: 16px;
 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 }
 
 .main-panel {
@@ -52,14 +52,14 @@ p {
 }
 
 .turn-box {
-    margin-bottom: 16px;
-    padding: 14px 16px;
+    margin-bottom: 12px;
+    padding: 12px;
 
     text-align: center;
-    font-size: 24px;
+    font-size: 26px;
 
     background: #2c2c2c;
-    border-radius: 18px;
+    border-radius: 16px;
     border: 1px solid #444;
 }
 
@@ -120,7 +120,7 @@ button:disabled {
 }
 
 .player-card {
-    padding: 14px;
+    padding: 12px;
 
     background: #303030;
     border: 2px solid #444;
@@ -143,14 +143,32 @@ button:disabled {
 .player-name {
     margin-bottom: 10px;
 
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
 }
 
 .player-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.player-stats span {
+    padding: 10px 6px;
+
+    text-align: center;
+    font-size: 18px;
+
+    background: #1d1d1d;
+    border-radius: 12px;
+}
+
+.player-stats strong {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 26px;
 }
 
 .player-status {
@@ -224,4 +242,61 @@ ul {
     font-size: 18px;
 
     color: #aaaaaa;
+}
+
+.attack-title {
+    margin-bottom: 10px;
+
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.attack-formula,
+.attack-line {
+    margin: 6px 0;
+
+    line-height: 1.35;
+}
+
+.damage-text {
+    margin-top: 10px;
+    padding: 10px;
+
+    color: #ffb3b3;
+    background: #4a1f1f;
+    border-radius: 12px;
+
+    font-weight: bold;
+}
+
+.blocked-text {
+    margin-top: 10px;
+    padding: 10px;
+
+    color: #d5ffd5;
+    background: #1f3d24;
+    border-radius: 12px;
+
+    font-weight: bold;
+}
+
+.charges-lost-text {
+    margin-top: 8px;
+    padding: 10px;
+
+    background: #3a2f1d;
+    border-radius: 12px;
+
+    font-weight: bold;
+}
+
+.eliminated-text {
+    margin-top: 8px;
+    padding: 10px;
+
+    color: #ffdddd;
+    background: #5a1717;
+    border-radius: 12px;
+
+    font-weight: bold;
 }

@@ -311,12 +311,31 @@ io.on('connection', (socket) => {
 
         const attackValue = attackCard + chargeSum;
 
+        const chargesText =
+            usedCharges.length === 0
+            ? 'nessun carico'
+            : usedCharges.join(' + ');
+
         if (targetPlayer.defense >= attackValue) {
-            room.lastAction =
-                `${attacker.name} ha attaccato ${targetPlayer.name}: carta ${attackCard} + carichi ${chargeSum} = ${attackValue}. Difesa ${targetPlayer.defense}. Attacco bloccato.`;
+            room.lastAction = {
+                type: 'attack',
+                attackerName: attacker.name,
+                targetName: targetPlayer.name,
+                attackCard: attackCard,
+                usedCharges: usedCharges,
+                chargeSum: chargeSum,
+                attackValue: attackValue,
+                defense: targetPlayer.defense,
+                damage: 0,
+                blocked: true,
+                targetLostCharges: false,
+                targetEliminated: false,
+                text: `${attacker.name} attacca ${targetPlayer.name}.`
+            };
         }
         else {
             const damage = attackValue - targetPlayer.defense;
+            const lostChargeCount = targetPlayer.charges.length;
 
             targetPlayer.lives -= damage;
             targetPlayer.charges = [];
@@ -325,16 +344,42 @@ io.on('connection', (socket) => {
                 targetPlayer.lives = 0;
                 targetPlayer.alive = false;
 
-                room.lastAction =
-                    `${attacker.name} ha attaccato ${targetPlayer.name}: carta ${attackCard} + carichi ${chargeSum} = ${attackValue}. Difesa ${targetPlayer.defense}. Danno ${damage}. ${targetPlayer.name} è eliminato.`;
+                room.lastAction = {
+                    type: 'attack',
+                    attackerName: attacker.name,
+                    targetName: targetPlayer.name,
+                    attackCard: attackCard,
+                    usedCharges: usedCharges,
+                    chargeSum: chargeSum,
+                    attackValue: attackValue,
+                    defense: targetPlayer.defense,
+                    damage: damage,
+                    blocked: false,
+                    targetLostCharges: lostChargeCount > 0,
+                    lostChargeCount: lostChargeCount,
+                    targetEliminated: true,
+                    text: `${attacker.name} attacca ${targetPlayer.name}.`
+                };
             }
             else {
-                room.lastAction =
-                    `${attacker.name} ha attaccato ${targetPlayer.name}: carta ${attackCard} + carichi ${chargeSum} = ${attackValue}. Difesa ${targetPlayer.defense}. Danno ${damage}. ${targetPlayer.name} perde tutti i carichi.`;
+                room.lastAction = {
+                    type: 'attack',
+                    attackerName: attacker.name,
+                    targetName: targetPlayer.name,
+                    attackCard: attackCard,
+                    usedCharges: usedCharges,
+                    chargeSum: chargeSum,
+                    attackValue: attackValue,
+                    defense: targetPlayer.defense,
+                    damage: damage,
+                    blocked: false,
+                    targetLostCharges: lostChargeCount > 0,
+                    lostChargeCount: lostChargeCount,
+                    targetEliminated: false,
+                    text: `${attacker.name} attacca ${targetPlayer.name}.`
+                };
             }
         }
-
-        checkVictory(room);
 
         if (room.status !== 'finished') {
             nextTurn(room);

@@ -183,7 +183,7 @@ function renderGameState(state) {
 
     currentTurnDisplay.textContent = state.currentTurnPlayerName;
 
-    lastActionDisplay.textContent = state.lastAction || 'Nessuna azione ancora.';
+    renderLastAction(state.lastAction);
 
     if (state.winnerName) {
         winnerMessage.textContent = `Ha vinto ${state.winnerName}!`;
@@ -351,4 +351,78 @@ function renderPlayersList(players) {
 
         gamePlayersList.appendChild(card);
     });
+}
+
+function renderLastAction(lastAction) {
+    lastActionDisplay.innerHTML = '';
+
+    if (!lastAction) {
+        lastActionDisplay.textContent = 'Nessuna azione ancora.';
+        return;
+    }
+
+    if (typeof lastAction === 'string') {
+        lastActionDisplay.textContent = lastAction;
+        return;
+    }
+
+    if (lastAction.type !== 'attack') {
+        lastActionDisplay.textContent = lastAction.text || 'Azione eseguita.';
+        return;
+    }
+
+    const title = document.createElement('div');
+    title.classList.add('attack-title');
+    title.textContent =
+        `${lastAction.attackerName} attacca ${lastAction.targetName}`;
+
+    const formula = document.createElement('div');
+    formula.classList.add('attack-formula');
+
+    const chargesText =
+        lastAction.usedCharges.length === 0
+            ? '0'
+            : lastAction.usedCharges.join(' + ');
+
+    formula.textContent =
+        `Attacco = carta ${lastAction.attackCard} + carichi (${chargesText}) = ${lastAction.attackValue}`;
+
+    const defense = document.createElement('div');
+    defense.classList.add('attack-line');
+    defense.textContent =
+        `Difesa = ${lastAction.defense}`;
+
+    const result = document.createElement('div');
+
+    if (lastAction.blocked) {
+        result.classList.add('blocked-text');
+        result.textContent = 'Attacco bloccato: nessun danno.';
+    }
+    else {
+        result.classList.add('damage-text');
+        result.textContent = `Danno = ${lastAction.attackValue} - ${lastAction.defense} = ${lastAction.damage}`;
+    }
+
+    lastActionDisplay.appendChild(title);
+    lastActionDisplay.appendChild(formula);
+    lastActionDisplay.appendChild(defense);
+    lastActionDisplay.appendChild(result);
+
+    if (!lastAction.blocked && lastAction.targetLostCharges) {
+        const chargesLost = document.createElement('div');
+        chargesLost.classList.add('charges-lost-text');
+        chargesLost.textContent =
+            `${lastAction.targetName} perde ${lastAction.lostChargeCount} carichi.`;
+
+        lastActionDisplay.appendChild(chargesLost);
+    }
+
+    if (lastAction.targetEliminated) {
+        const eliminated = document.createElement('div');
+        eliminated.classList.add('eliminated-text');
+        eliminated.textContent =
+            `${lastAction.targetName} è eliminato.`;
+
+        lastActionDisplay.appendChild(eliminated);
+    }
 }
