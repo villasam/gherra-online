@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
 const http = require('http');
-
 const { Server } = require('socket.io');
+const { drawCard, drawLives } = require('./game/cards');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -14,13 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = new Map();
 
-function drawCard() {
-    return Math.floor(Math.random() * 10) + 1;
-}
 
-function drawLives() {
-    return drawCard() + drawCard() + drawCard() + drawCard();
-}
 
 function generateRoomCode() {
     const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
