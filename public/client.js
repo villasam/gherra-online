@@ -154,12 +154,18 @@ function renderLobby(players) {
 
         const readyText = player.ready ? 'Pronto' : 'Non pronto';
 
-        if (player.id === myId) {
-            li.textContent = `${player.name} (tu) - ${readyText}`;
-            myReady = player.ready;
+        li.textContent = `${player.name} - ${readyText}`;
+
+        if (player.ready) {
+            li.classList.add('ready-player');
         }
         else {
-            li.textContent = `${player.name} - ${readyText}`;
+            li.classList.add('not-ready-player');
+        }
+
+        if (player.id === myId) {
+            li.classList.add('my-lobby-player');
+            myReady = player.ready;
         }
 
         playersList.appendChild(li);
@@ -238,12 +244,7 @@ function renderDefenseTargets(players) {
         const option = document.createElement('option');
         option.value = player.id;
 
-        if (player.id === myId) {
-            option.textContent = `${player.name} (tu)`;
-        }
-        else {
-            option.textContent = player.name;
-        }
+        option.textContent = player.name;
 
         defenseTargetSelect.appendChild(option);
     });
@@ -316,12 +317,7 @@ function renderPlayersList(players) {
         const name = document.createElement('div');
         name.classList.add('player-name');
 
-        if (player.id === myId) {
-            name.textContent = `${player.name} (tu)`;
-        }
-        else {
-            name.textContent = player.name;
-        }
+        name.textContent = player.name;
 
         const stats = document.createElement('div');
         stats.classList.add('player-stats');

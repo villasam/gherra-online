@@ -1,9 +1,9 @@
 function generateRoomCode() {
-    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
     let code = '';
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
         const randomIndex = Math.floor(Math.random() * letters.length);
         code += letters[randomIndex];
     }

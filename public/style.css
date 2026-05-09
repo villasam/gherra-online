@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-    padding: 10px;
+    padding: 8px;
 
     font-family: Arial, sans-serif;
     font-size: 22px;
@@ -15,9 +15,10 @@ body {
 
 .screen {
     width: 100%;
-    max-width: 640px;
+    max-width: 100%;
     margin: 0 auto;
 }
+
 
 h1 {
     margin: 4px 0 12px 0;
@@ -127,13 +128,9 @@ button:disabled {
     border-radius: 16px;
 }
 
-.me-card {
-    border-color: #d6d6d6;
-}
-
 .turn-card {
     background: #3a3524;
-    border-color: #e6c15a;
+    border: 3px solid #e6c15a;
 }
 
 .dead-card {
@@ -299,4 +296,28 @@ ul {
     border-radius: 12px;
 
     font-weight: bold;
+}
+
+.my-lobby-player {
+    font-weight: bold;
+    color: #e6c15a;
+}
+
+.me-card {
+    border: 3px solid #303030;
+    box-shadow: 0 0 0 2px rgba(230, 193, 90, 0.25);
+}
+
+.me-card .player-name::after {
+    content: "  • tu";
+    color: #e6c15a;
+    font-size: 20px;
+}
+
+.ready-player {
+    color: #8dff8d;
+}
+
+.not-ready-player {
+    color: #ffd36b;
 }
